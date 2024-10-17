@@ -28,7 +28,7 @@ const classSchema = new mongoose.Schema({
     unique: true, // Ensure the code is unique
     default: function () {
       if (this.type === 'private') {
-        return uuidv4(); // Generate a unique code only for private classes
+         return uuidv4().slice(0, 8);
       }
       return null;
     },
