@@ -23,9 +23,11 @@ app.use('/api', userRoutes); // Mount user routes
 const classRoutes = require('./routes/classRoutes'); // Adjusted path to use relative path
 app.use('/api', classRoutes); // Mount class routes
 
-// Student Routes
+
+//Student Routes
 const studentRoutes = require('./routes/studentRoutes'); // Adjusted path to use relative path
-app.use('/api', studentRoutes); // Mount student routes
+app.use('/api', studentRoutes); // Mount class routes
+
 
 // Start server
 app.listen(PORT, () => {

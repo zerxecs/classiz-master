@@ -33,11 +33,11 @@ const classSchema = new mongoose.Schema({
       return null;
     },
   },
-  additionalInfo: {
+  students: {
     type: [String],
     default:[]
   },
-  students: [StudentSchema], 
+ 
 
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

@@ -7,14 +7,14 @@ const router = express.Router();
 
 // Route to create a new class
 router.post('/create-class', authMiddleware, async (req, res) => {
-  const { name, description, type, additionalInfo } = req.body;
+  const { name, description, type, students } = req.body;
 
   try {
     const newClass = new Class({
       name,
       description,
       type,
-      additionalInfo, // Assuming this contains student emails
+      students, // Assuming this contains student emails
       createdBy: req.user._id,
     });
 
@@ -46,7 +46,7 @@ router.get('/class/:id', authMiddleware, async (req, res) => {
     }
 
     // Find students based on emails stored in additionalInfo
-    const students = await User.find({ email: { $in: classData.additionalInfo } });
+    const students = await User.find({ email: { $in: classData.students } });
     
     res.json({ success: true, class: { ...classData._doc, students } });
   } catch (error) {
@@ -55,45 +55,63 @@ router.get('/class/:id', authMiddleware, async (req, res) => {
 });
 
 
+// POST route to add multiple students to a class
+router.post('/class/:id/add-students', authMiddleware, async (req, res) => {
+  const classId = req.params.id;
+  const { emails } = req.body;
 
-
-// POST route to add a student to a class
-router.post('/class/:classId/add-student', async (req, res) => {
-  const { classId } = req.params;
-  const { fname, lname, email } = req.body;
-
-  // Validate request data
-  if (!fname || !lname || !email) {
-    return res.status(400).json({ success: false, error: 'All fields are required.' });
+  if (!Array.isArray(emails)) {
+    return res.status(400).json({ success: false, error: 'Invalid input. Emails must be an array.' });
   }
 
   try {
-    // Find the class by ID
-    const classItem = await Class.findById(classId);
+    const classToUpdate = await Class.findById(classId);
+    if (!classToUpdate) {
+      return res.status(404).json({ success: false, error: 'Class not found' });
+    } 
 
-    if (!classItem) {
-      return res.status(404).json({ success: false, error: 'Class not found.' });
-    }
+    await Class.updateOne(
+      { _id: classId },
+      { $addToSet: { students: { $each: emails } } } // Adding emails directly
+    );
 
-    // Create a new student object
-    const newStudent = { fname, lname, email };
-
-    // Add the new student to the class's student list
-    classItem.students.push(newStudent);
-
-    // Save the updated class
-    await classItem.save();
-
-    return res.status(200).json({ success: true, class: classItem });
-  } catch (err) {
-    console.error('Error adding student:', err);
-    return res.status(500).json({ success: false, error: 'An error occurred while adding the student.' });
+    const updatedClass = await Class.findById(classId).populate('students'); // Assuming `students` is an ObjectId reference
+    return res.json({ success: true, class: updatedClass });
+  } catch (error) {
+    console.error('Error adding students:', error);
+    return res.status(500).json({ success: false, error: 'An error occurred while adding students' });
   }
 });
 
+// Route to remove a student from a class
+router.post('/class/:id/remove-student', authMiddleware, async (req, res) => {
+  const classId = req.params.id;
+  const { email } = req.body;
 
+  if (!email) {
+    return res.status(400).json({ success: false, error: 'Email is required.' });
+  }
 
+  try {
+    const classToUpdate = await Class.findById(classId);
+    if (!classToUpdate) {
+      return res.status(404).json({ success: false, error: 'Class not found.' });
+    }
+
+    // Remove the student by filtering out the email
+    classToUpdate.students = classToUpdate.students.filter(studentEmail => studentEmail !== email);
+
+    // Save the updated class
+    await classToUpdate.save();
+
+    // Fetch the updated class to return
+    const updatedClass = await Class.findById(classId);
+    
+    return res.json({ success: true, class: updatedClass });
+  } catch (error) {
+    console.error('Error removing student:', error);
+    return res.status(500).json({ success: false, error: 'An error occurred while removing the student.' });
+  }
+});
 
 module.exports = router;
-
-

@@ -13,14 +13,14 @@ import logoutIcon from '@iconify/icons-fluent/person-12-filled';
 import helpIcon from '@iconify/icons-fluent/settings-24-filled';
 import searchIcon from '@iconify/icons-material-symbols/search';
 
-import Home from './instructor/Home';
-import Classes from './instructor/Classes';
-import CreateClass from './instructor/CreateClass';
-import CreateActivity from './instructor/CreateActivity';
-import Quizzes from './instructor/Quizzes';
-import Exams from './instructor/Exams';
-import Logout from './instructor/Logout';
-import HelpSupport from './instructor/HelpSupport';
+import Home from './student/Home';
+import Classes from './student/Classes';
+import CreateClass from './student/CreateClass';
+import CreateActivity from './student/CreateActivity';
+import Quizzes from './student/Quizzes';
+import Exams from './student/Exams';
+import Logout from './student/Logout';
+import HelpSupport from './student/HelpSupport';
 
 // Sidebar Component
 const Sidebar = ({ setContent, setShowPrivate }) => {

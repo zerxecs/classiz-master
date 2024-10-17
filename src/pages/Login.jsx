@@ -35,7 +35,7 @@ const Login = () => {
       if (data.role === 'instructor') {
         window.location.href = './instructor'; 
       } else if (data.role === 'student') {
-        window.location.href = '/landingpage'; 
+        window.location.href = './student'; 
       }
       }
     } catch (error) {
