@@ -21,16 +21,18 @@ const classSchema = new mongoose.Schema({
   type: {
     type: String,
     enum: ['public', 'private'],
-    default: 'private',
+    default:''
   },
   code: {
+    
     type: String,
     unique: true, // Ensure the code is unique
+    sparse: true, // This ensures only non-null codes are enforced as unique
     default: function () {
       if (this.type === 'private') {
          return uuidv4().slice(0, 8);
       }
-      return null;
+     return null;
     },
   },
   students: {
